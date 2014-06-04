@@ -29,3 +29,22 @@ package {$mypackages:
   ensure    => "installed"
 }->
 python::requirements { '/vagrant/requirements.txt': }
+
+vcsrepo { "/opt/scraping/${repo}":
+  ensure => latest,
+  provider => git,
+  source => "https://github.com/scrapinghub/portia.git",
+  revision => 'master'
+}
+
+exec { "install_portia":
+    command => "pip install -r requirements.txt",
+    cwd    => "/opt/scraping/slyd"
+}
+
+exec { "run_portia" : 
+    command => "twistd -n slyd" ,
+    cwd    => "/opt/scraping/slyd",
+    require     => Exec['install_portia']
+}
+
